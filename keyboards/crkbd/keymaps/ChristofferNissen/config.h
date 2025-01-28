@@ -30,7 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // use :dfu-split-left or :dfu-split-right
 // sudo util/docker_build.sh crkbd:ChristofferNissen:dfu-split-left
 
-#define SSD1306OLED
 #define USE_I2C
 #define USE_SERIAL_PD2
 
@@ -118,7 +117,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define OLED_FONT_H "keyboards/crkbd/keymaps/ChristofferNissen/glcdfont.c"
 
 #undef PRODUCT
-#define PRODUCT Awesome Corne Keyboard
+#define PRODUCT "Awesome Corne Keyboard"
 
 #define USB_POLLING_INTERVAL_MS 1
 
@@ -131,12 +130,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ChristofferNissen custom
 // #define DANISH
 #define I3UI
-#define UNICODE_SELECTED_MODES UC_LNX
+#define UNICODE_SELECTED_MODES UNICODE_MODE_LINUX
 
 
 
 // Prevent normal rollover on alphas from accidentally triggering mods.
-#define IGNORE_MOD_TAP_INTERRUPT
+// #define IGNORE_MOD_TAP_INTERRUPT
 
 // This prevents accidental repeats of the tap-hold keys when typing quickly.
 #define TAPPING_FORCE_HOLD_PER_KEY
