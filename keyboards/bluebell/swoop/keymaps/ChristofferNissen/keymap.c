@@ -30,6 +30,10 @@
 #define _MOUSEL 5
 #define _MOUSER 6
 
+#define TRI_LAYER_LOWER_LAYER 1
+#define TRI_LAYER_RAISE_LAYER 2
+#define TRI_LAYER_ADJUST_LAYER 3
+
 // Layers
 #define LOWER MO(_LOWER)
 #define RAISE MO(_RAISE)
@@ -39,13 +43,13 @@
 
 // Thumb keys
 #define T0 LT(MOUSEL, KC_ESC)
-#define T1 LT(ARROW, KC_BSPC) 
+#define T1 LT(ARROW, KC_BSPC)
 #define T2 LT(LOWER, KC_SPC)
 #define T3 LT(RAISE, KC_TAB)
 #define T4 KC_ENT
 #define T5 LT(MOUSER, KC_QUOT)
 
-// Mod taps homerow 
+// Mod taps homerow
 #define HR_A MT(MOD_LGUI, KC_A)
 #define HR_S MT(MOD_LALT, KC_S)
 #define HR_D MT(MOD_LSFT, KC_D)
@@ -54,12 +58,6 @@
 #define HR_K MT(MOD_RSFT, KC_K)
 #define HR_L MT(MOD_LALT, KC_L)
 #define HR_SCLN MT(MOD_RGUI, KC_SCLN)
-
-// enum custom_keycodes {
-//   ADJUST,
-// };
-
-
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
@@ -90,7 +88,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------|
       KC_F11,  KC_F12, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX, XXXXXXX,   LOWER,      RAISE, XXXXXXX, XXXXXXX
+                                          XXXXXXX, XXXXXXX,   TL_LOWR,      TL_UPPR, XXXXXXX, XXXXXXX
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -102,7 +100,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------|
     KC_TILDE, KC_SLSH, KC_BSLS, KC_PIPE,  KC_GRV,                       KC_EQL, KC_MINS, KC_UNDS, KC_LCBR, KC_RCBR,
   //|--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX, XXXXXXX,   LOWER,      RAISE, XXXXXXX, XXXXXXX
+                                          XXXXXXX, XXXXXXX,   TL_LOWR,      TL_UPPR, XXXXXXX, XXXXXXX
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -114,7 +112,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------|
      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_MPLY, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX, XXXXXXX,   LOWER,      RAISE, XXXXXXX, XXXXXXX
+                                          XXXXXXX, XXXXXXX,   TL_LOWR,      TL_UPPR, XXXXXXX, XXXXXXX
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -156,45 +154,3 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
-// determine if both LOWER and RAISE are held
-void adjust_layer(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
-  if (IS_LAYER_ON(layer1) && IS_LAYER_ON(layer2)) {
-    layer_on(layer3);
-  } else {
-    layer_off(layer3);
-  }
-}
-
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  if (record->event.pressed) {
-    switch (keycode) {
-        case LOWER:
-        if (record->event.pressed) {
-            layer_on(_LOWER);
-            adjust_layer(_LOWER, _RAISE, _ADJUST);
-        } else {
-            layer_off(_LOWER);
-            adjust_layer(_LOWER, _RAISE, _ADJUST);
-        }
-        return false;
-        case RAISE:
-        if (record->event.pressed) {
-            layer_on(_RAISE);
-            adjust_layer(_LOWER, _RAISE, _ADJUST);
-        } else {
-            layer_off(_RAISE);
-            adjust_layer(_LOWER, _RAISE, _ADJUST);
-        }
-        return false;
-        // case ADJUST:
-        //     if (record->event.pressed) {
-        //       layer_on(_ADJUST);
-        //     } else {
-        //       layer_off(_ADJUST);
-        //     }
-        //     return false;
-    }
-  }
-
-  return true;
-}
