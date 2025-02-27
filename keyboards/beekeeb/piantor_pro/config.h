@@ -18,22 +18,22 @@
 
 
 
-#define EE_HANDS
-
 #define TAPPING_TERM 175
 
-// This prevents accidental repeats of the tap-hold keys when typing quickly.
-#define QUICK_TAP_TERM_PER_KEY
+#undef FORCE_NKRO
+#define FORCE_NKRO
+
+#define USB_POLLING_INTERVAL_MS 1
 
 // Other settings //
 #define HOLD_ON_OTHER_KEY_PRESS_PER_KEY
 
 // Enable rapid switch from tap to hold, disables double tap hold auto-repeat.
-// #define QUICK_TAP_TERM
+// #define TAPPING_FORCE_HOLD
+#define QUICK_TAP_TERM 150
 
 // Apply the modifier on keys that are tapped during a short hold of a modtap
 #define PERMISSIVE_HOLD
-
 
 // Shamelessly stolen mouse key settings from @pierrechevalier83 //
 
