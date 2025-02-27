@@ -13,7 +13,8 @@
 		"mousekey": true,
 		"extrakey": true,
 		"rgblight": true,
-		"tri_layer": true
+		"tri_layer": true,
+		"autocorrect": true
 	},
 	"ws2812": {
 		"pin": "D3"
