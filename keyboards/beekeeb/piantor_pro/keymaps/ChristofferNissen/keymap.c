@@ -5,42 +5,44 @@
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
-#define _BASE 0
-#define _LOWER 1
-#define _RAISE 2
-#define _ADJUST 3
-#define _ARROW 4
-#define _MOUSEL 5
-#define _MOUSER 6
+enum layers {
+    _BASE = 0,
+    _LOWER = 1,
+    _RAISE = 2,
+    _ADJUST = 3,
+    _ARROW,
+    _MOUSEL,
+    _MOUSER
+};
 
-// Layers
-#define LOWER MO(_LOWER)
-#define RAISE MO(_RAISE)
-#define MOUSEL TT(_MOUSEL)
-#define MOUSER TT(_MOUSER)
-#define ARROW MO(_ARROW)
+#define TRI_LAYER_LOWER_LAYER 1
+#define TRI_LAYER_RAISE_LAYER 2
+#define TRI_LAYER_ADJUST_LAYER 3
 
+enum custom_keycodes {
+// Layer overlay keycodes
+    LOWER = MO(_LOWER),
+    RAISE = MO(_RAISE),
+    ARROW = MO(_ARROW),
+    MOUSEL = TT(_MOUSEL),
+    MOUSER = TT(_MOUSER),
 // Thumb keys
-#define T0 LT(MOUSEL, KC_ESC)
-#define T1 LT(ARROW, KC_TAB) 
-#define T2 LT(LOWER, KC_SPC)
-#define T3 LT(RAISE, KC_BSPC)
-#define T4 KC_ENT
-#define T5 LT(MOUSER, KC_QUOT) 
-
-// Mod taps homerow 
-#define HR_A MT(MOD_LGUI, KC_A)
-#define HR_S MT(MOD_LALT, KC_S)
-#define HR_D MT(MOD_LSFT, KC_D)
-#define HR_F MT(MOD_LCTL, KC_F)
-#define HR_J MT(MOD_RCTL, KC_J)
-#define HR_K MT(MOD_RSFT, KC_K)
-#define HR_L MT(MOD_LALT, KC_L)
-#define HR_SCLN MT(MOD_RGUI, KC_SCLN)
-
-// enum custom_keycodes {
-//   ADJUST,
-// };
+    T0 = LT(MOUSEL, KC_ESC),
+    T1 = LT(ARROW, KC_BSPC),
+    T2 = LT(LOWER, KC_SPC),
+    T3 = LT(RAISE, KC_TAB),
+    T4 = KC_ENT,
+    T5 = LT(MOUSER, KC_QUOT),
+// Mod taps homerow
+    HR_A = MT(MOD_LGUI, KC_A),
+    HR_S = MT(MOD_LALT, KC_S),
+    HR_D = MT(MOD_LSFT, KC_D),
+    HR_F = MT(MOD_LCTL, KC_F),
+    HR_J = MT(MOD_RCTL, KC_J),
+    HR_K = MT(MOD_RSFT, KC_K),
+    HR_L = MT(MOD_LALT, KC_L),
+    HR_SCLN = MT(MOD_RGUI, KC_SCLN),
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT_split_3x6_3(
@@ -63,7 +65,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       _______,  KC_F11,  KC_F12, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX, XXXXXXX,   LOWER,      RAISE, XXXXXXX, XXXXXXX
+                                          XXXXXXX, XXXXXXX, TL_LOWR,    TL_UPPR, XXXXXXX, XXXXXXX
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -75,7 +77,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       _______,KC_TILDE, KC_SLSH, KC_BSLS, KC_PIPE,  KC_GRV,                       KC_EQL, KC_MINS, KC_UNDS, KC_LCBR, KC_RCBR, _______,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX, XXXXXXX,   LOWER,      RAISE, XXXXXXX, XXXXXXX
+                                          XXXXXXX,  KC_DEL, TL_LOWR,    TL_UPPR, XXXXXXX, XXXXXXX
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -87,7 +89,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_MPLY, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX, XXXXXXX,   LOWER,      RAISE, XXXXXXX, XXXXXXX
+                                          XXXXXXX, XXXXXXX, TL_LOWR,    TL_UPPR, XXXXXXX, XXXXXXX
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -152,46 +154,3 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //   ),
 
 };
-
-// determine if both LOWER and RAISE are held
-void adjust_layer(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
-  if (IS_LAYER_ON(layer1) && IS_LAYER_ON(layer2)) {
-    layer_on(layer3);
-  } else {
-    layer_off(layer3);
-  }
-}
-
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  if (record->event.pressed) {
-    switch (keycode) {
-        case LOWER:
-        if (record->event.pressed) {
-            layer_on(_LOWER);
-            adjust_layer(_LOWER, _RAISE, _ADJUST);
-        } else {
-            layer_off(_LOWER);
-            adjust_layer(_LOWER, _RAISE, _ADJUST);
-        }
-        return false;
-        case RAISE:
-        if (record->event.pressed) {
-            layer_on(_RAISE);
-            adjust_layer(_LOWER, _RAISE, _ADJUST);
-        } else {
-            layer_off(_RAISE);
-            adjust_layer(_LOWER, _RAISE, _ADJUST);
-        }
-        return false;
-        // case ADJUST:
-        //     if (record->event.pressed) {
-        //       layer_on(_ADJUST);
-        //     } else {
-        //       layer_off(_ADJUST);
-        //     }
-        //     return false;
-    }
-  }
-
-  return true;
-}
