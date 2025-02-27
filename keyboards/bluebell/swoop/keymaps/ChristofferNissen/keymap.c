@@ -14,50 +14,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
-
-// enum layers {
-//     _QWERTY
-// };
-
+#include "keymap_danish.h"
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
-#define _BASE 0
-#define _LOWER 1
-#define _RAISE 2
-#define _ADJUST 3
-#define _ARROW 4
-#define _MOUSEL 5
-#define _MOUSER 6
+enum layers {
+    _BASE = 0,
+    _LOWER = 1,
+    _RAISE = 2,
+    _ADJUST = 3,
+    _ARROW,
+    _MOUSEL,
+    _MOUSER
+};
 
 #define TRI_LAYER_LOWER_LAYER 1
 #define TRI_LAYER_RAISE_LAYER 2
 #define TRI_LAYER_ADJUST_LAYER 3
 
-// Layers
-#define LOWER MO(_LOWER)
-#define RAISE MO(_RAISE)
-#define MOUSEL TT(_MOUSEL)
-#define MOUSER TT(_MOUSER)
-#define ARROW MO(_ARROW)
-
+enum custom_keycodes {
+// Layer overlay keycodes
+    LOWER = MO(_LOWER),
+    RAISE = MO(_RAISE),
+    ARROW = MO(_ARROW),
+    MOUSEL = TT(_MOUSEL),
+    MOUSER = TT(_MOUSER),
 // Thumb keys
-#define T0 LT(MOUSEL, KC_ESC)
-#define T1 LT(ARROW, KC_BSPC)
-#define T2 LT(LOWER, KC_SPC)
-#define T3 LT(RAISE, KC_TAB)
-#define T4 KC_ENT
-#define T5 LT(MOUSER, KC_QUOT)
-
+    T0 = LT(MOUSEL, KC_ESC),
+    T1 = LT(ARROW, KC_BSPC),
+    T2 = LT(LOWER, KC_SPC),
+    T3 = LT(RAISE, KC_TAB),
+    T4 = KC_ENT,
+    T5 = LT(MOUSER, KC_QUOT),
 // Mod taps homerow
-#define HR_A MT(MOD_LGUI, KC_A)
-#define HR_S MT(MOD_LALT, KC_S)
-#define HR_D MT(MOD_LSFT, KC_D)
-#define HR_F MT(MOD_LCTL, KC_F)
-#define HR_J MT(MOD_RCTL, KC_J)
-#define HR_K MT(MOD_RSFT, KC_K)
-#define HR_L MT(MOD_LALT, KC_L)
-#define HR_SCLN MT(MOD_RGUI, KC_SCLN)
+    HR_A = MT(MOD_LGUI, KC_A),
+    HR_S = MT(MOD_LALT, KC_S),
+    HR_D = MT(MOD_LSFT, KC_D),
+    HR_F = MT(MOD_LCTL, KC_F),
+    HR_J = MT(MOD_RCTL, KC_J),
+    HR_K = MT(MOD_RSFT, KC_K),
+    HR_L = MT(MOD_LALT, KC_L),
+    HR_SCLN = MT(MOD_RGUI, KC_SCLN),
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
@@ -94,9 +92,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_RAISE] = LAYOUT_split_3x5_3(
   //,--------------------------------------------.                    ,--------------------------------------------.
-     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, KC_PLUS, XXXXXXX, KC_LBRC, KC_RBRC,
+     XXXXXXX, XXXXXXX,  DK_ARNG,   DK_AE, DK_OSTR,                      XXXXXXX, KC_PLUS, XXXXXXX, KC_LBRC, KC_RBRC,
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------|
-     KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC,                      KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN,
+     KC_EXLM,   KC_AT,  KC_HASH,  KC_DLR, KC_PERC,                      KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN,
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------|
     KC_TILDE, KC_SLSH, KC_BSLS, KC_PIPE,  KC_GRV,                       KC_EQL, KC_MINS, KC_UNDS, KC_LCBR, KC_RCBR,
   //|--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------|
@@ -108,7 +106,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,--------------------------------------------.                    ,--------------------------------------------.
      QK_BOOT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------|
-     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_MUTE, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT,
+     AC_TOGG, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_MUTE, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT,
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------|
      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_MPLY, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------|
