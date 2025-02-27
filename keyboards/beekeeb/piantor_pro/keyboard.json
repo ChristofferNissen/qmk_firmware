@@ -12,7 +12,8 @@
         "mousekey": true,
         "nkro": true,
         "ios_device": true,
-        "raw": true
+        "raw": true,
+        "tri_layer": true
     },
     "matrix_pins": {
         "cols": ["GP11", "GP12", "GP13", "GP14", "GP15", "GP16"],
