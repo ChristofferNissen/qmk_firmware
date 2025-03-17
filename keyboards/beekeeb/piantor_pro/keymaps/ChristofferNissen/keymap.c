@@ -6,7 +6,8 @@
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
 enum layers {
-    _BASE = 0,
+    // _BASE = 0,
+    _COLEMAKDH = 0,
     _LOWER = 1,
     _RAISE = 2,
     _ADJUST = 3,
@@ -28,12 +29,12 @@ enum custom_keycodes {
     MOUSER = TT(_MOUSER),
 // Thumb keys
     T0 = LT(MOUSEL, KC_ESC),
-    T1 = LT(ARROW, KC_BSPC),
-    T2 = LT(LOWER, KC_SPC),
+    T1 = LT(ARROW, KC_SPC),
+    T2 = LT(LOWER, KC_BSPC),
     T3 = LT(RAISE, KC_TAB),
     T4 = KC_ENT,
     T5 = LT(MOUSER, KC_QUOT),
-// Mod taps homerow
+// _BASE Mod taps homerow
     HR_A = MT(MOD_LGUI, KC_A),
     HR_S = MT(MOD_LALT, KC_S),
     HR_D = MT(MOD_LSFT, KC_D),
@@ -50,16 +51,37 @@ enum custom_keycodes {
     HR_8 = MT(MOD_RSFT, KC_8),
     HR_9 = MT(MOD_RALT, KC_9),
     HR_0 = MT(MOD_RGUI, KC_0),
+// _COLEMAKDH mod taps homerow
+    // HR_A = MT(MOD_LGUI, KC_A), same as qwerty
+    HR_R = MT(MOD_LALT, KC_R),
+    HR_S_C = MT(MOD_LSFT, KC_S),
+    HR_T = MT(MOD_LCTL, KC_T),
+    HR_N = MT(MOD_RCTL, KC_N),
+    HR_E = MT(MOD_RSFT, KC_E),
+    HR_I = MT(MOD_RALT, KC_I),
+    HR_O = MT(MOD_RGUI, KC_O),
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [_BASE] = LAYOUT_split_3x6_3(
+  //   [_BASE] = LAYOUT_split_3x6_3(
+  // //,-----------------------------------------------------.                    ,-----------------------------------------------------.
+  //     _______,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,  _______,
+  // //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+  //     _______,    HR_A,    HR_S,    HR_D,    HR_F,    KC_G,                         KC_H,    HR_J,    HR_K,    HR_L, HR_SCLN, _______,
+  // //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+  //     _______,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, _______,
+  // //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
+  //                                              T0,      T1,      T2,         T3,      T4,      T5
+  //                                     //`--------------------------'  `--------------------------'
+  // ),
+
+    [_COLEMAKDH] = LAYOUT_split_3x6_3(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-      _______,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,  _______,
+      _______,    KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                         KC_J,    KC_L,    KC_U,    KC_Y, KC_SCLN, _______,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      _______,    HR_A,    HR_S,    HR_D,    HR_F,    KC_G,                         KC_H,    HR_J,    HR_K,    HR_L, HR_SCLN, _______,
+      _______,    HR_A,    HR_R,  HR_S_C,    HR_T,    KC_G,                         KC_M,    HR_N,    HR_E,    HR_I,    HR_O, _______,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      _______,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, _______,
+      _______,    KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,                         KC_K,    KC_H, KC_COMM,  KC_DOT, KC_SLSH, _______,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                T0,      T1,      T2,         T3,      T4,      T5
                                       //`--------------------------'  `--------------------------'
@@ -93,7 +115,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
       _______, QK_BOOT, XXXXXXX, XXXXXXX, XXXXXXX, KC_SLEP,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_MUTE, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT, _______,
+      _______, XXXXXXX, XXXXXXX, XXXXXXX,   DF(4),   DF(0),                      KC_MUTE, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT, _______,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_MPLY, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
