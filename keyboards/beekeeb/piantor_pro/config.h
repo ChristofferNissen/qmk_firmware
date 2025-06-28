@@ -16,12 +16,7 @@
 #define SPLIT_HAND_PIN GP17
 #define SPLIT_HAND_PIN_LOW_IS_LEFT
 
-
-
 #define TAPPING_TERM 175
-
-#undef FORCE_NKRO
-#define FORCE_NKRO
 
 #define USB_POLLING_INTERVAL_MS 1
 
@@ -52,4 +47,3 @@
 #define MOUSEKEY_DELAY 50
 
 #define TAPPING_TOGGLE 3
-
