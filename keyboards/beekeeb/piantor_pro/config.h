@@ -47,3 +47,5 @@
 #define MOUSEKEY_DELAY 50
 
 #define TAPPING_TOGGLE 3
+
+#define FLOW_TAP_TERM 150
