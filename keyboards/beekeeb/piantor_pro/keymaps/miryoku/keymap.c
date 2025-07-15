@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include QMK_KEYBOARD_H
+#include "os_detection.h"
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
@@ -154,3 +155,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //   ),
 
 };
+
+#if defined(OS_DETECTION_ENABLE)
+bool process_detected_host_os_user(os_variant_t detected_os) {
+  const bool is_mac = (detected_os == OS_MACOS || detected_os == OS_IOS);
+  // Swap Alt and GUI keys if a Mac or iOS machine is detected.
+  keymap_config.swap_lalt_lgui = is_mac;
+  keymap_config.swap_ralt_rgui = is_mac;
+  // keymap_config.swap_lctl_lgui = is_mac;
+  // keymap_config.swap_rctl_rgui = is_mac;
+  return true;
+}
+#endif
+
