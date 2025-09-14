@@ -18,7 +18,10 @@
 
 #define TAPPING_TERM 175
 
+// 1000hz polling rate for better mouse key response
 #define USB_POLLING_INTERVAL_MS 1
+
+#define DEBOUNCE 2
 
 // Other settings //
 #define HOLD_ON_OTHER_KEY_PRESS_PER_KEY
