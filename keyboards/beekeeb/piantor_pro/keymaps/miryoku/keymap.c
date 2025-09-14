@@ -3,6 +3,7 @@
 
 #include QMK_KEYBOARD_H
 #include "os_detection.h"
+#include <stdlib.h>  // for rand()
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
@@ -53,6 +54,8 @@ enum custom_keycodes {
     // HR_A = MT(MOD_RSFT, KC_A),
     // HR_E = MT(MOD_RALT, KC_E),
     // HR_I = MT(MOD_RGUI, KC_I),
+
+    REPEAT_TOGGLE
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -190,4 +193,113 @@ bool process_detected_host_os_user(os_variant_t detected_os) {
   return true;
 }
 #endif
+
+// World of Warcraft
+
+#define LAYER_GAMING 1
+
+typedef struct {
+    uint16_t keycode;
+    uint16_t interval_ms;        // Base interval
+    uint16_t jitter_ms;          // Max jitter
+    uint16_t current_interval_ms;// Actual interval for this repeat
+    bool repeat_active;
+    bool first_press_sent;
+    uint16_t timer;
+    bool hold;                   // true = hold for repeat, false = toggle repeat
+} repeat_key_t;
+
+// D is toggle-to-repeat, interval 2500ms; F is hold-to-repeat (example)
+repeat_key_t repeat_keys[] = {
+    {KC_D, 2500, 50, 2500, false, false, 0, false},   // D toggles repeat, 2.5s interval
+    {KC_X, 5000, 100, 5000, false, false, 0, true}      // X hold-to-repeat, 200ms interval
+    // {KC_F, 200, 100, 200, false, false, 0, true}      // F hold-to-repeat, 200ms interval
+};
+#define NUM_REPEAT_KEYS (sizeof(repeat_keys)/sizeof(repeat_keys[0]))
+
+bool repeat_mode_enabled = true;  // Or toggleable elsewhere
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (keycode == REPEAT_TOGGLE && record->event.pressed) {
+        repeat_mode_enabled = !repeat_mode_enabled;
+        return false;
+    }
+
+    if (repeat_mode_enabled && layer_state_is(LAYER_GAMING)) {
+        // 1. Check for hold-repeat cancellation by other key presses
+        if (record->event.pressed) {
+            for (int i = 0; i < NUM_REPEAT_KEYS; i++) {
+                if (repeat_keys[i].repeat_active
+                    && keycode != repeat_keys[i].keycode) {
+                    repeat_keys[i].repeat_active = false;
+                    repeat_keys[i].first_press_sent = false;
+                }
+            }
+        }
+
+        // 2. Handle repeat logic as before
+        for (int i = 0; i < NUM_REPEAT_KEYS; i++) {
+            if (keycode == repeat_keys[i].keycode) {
+                if (repeat_keys[i].hold) {
+                    // Hold-to-repeat logic
+                    if (record->event.pressed) {
+                        register_code(repeat_keys[i].keycode);
+                        unregister_code(repeat_keys[i].keycode);
+                        repeat_keys[i].repeat_active = true;
+                        repeat_keys[i].first_press_sent = true;
+                        repeat_keys[i].timer = timer_read();
+                        repeat_keys[i].current_interval_ms = repeat_keys[i].interval_ms;
+                        if (repeat_keys[i].jitter_ms > 0) {
+                            repeat_keys[i].current_interval_ms += rand() % (repeat_keys[i].jitter_ms + 1);
+                        }
+                    } else {
+                        repeat_keys[i].repeat_active = false;
+                        repeat_keys[i].first_press_sent = false;
+                    }
+                } else {
+                    // Toggle-to-repeat logic
+                    if (record->event.pressed) {
+                        if (repeat_keys[i].repeat_active) {
+                            // Turn off
+                            repeat_keys[i].repeat_active = false;
+                            repeat_keys[i].first_press_sent = false;
+                        } else {
+                            // Turn on and send initial press
+                            register_code(repeat_keys[i].keycode);
+                            unregister_code(repeat_keys[i].keycode);
+                            repeat_keys[i].repeat_active = true;
+                            repeat_keys[i].first_press_sent = true;
+                            repeat_keys[i].timer = timer_read();
+                            repeat_keys[i].current_interval_ms = repeat_keys[i].interval_ms;
+                            if (repeat_keys[i].jitter_ms > 0) {
+                                repeat_keys[i].current_interval_ms += rand() % (repeat_keys[i].jitter_ms + 1);
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void matrix_scan_user(void) {
+    if (repeat_mode_enabled && layer_state_is(LAYER_GAMING)) {
+        for (int i = 0; i < NUM_REPEAT_KEYS; i++) {
+            if (repeat_keys[i].repeat_active && repeat_keys[i].first_press_sent) {
+                if (timer_elapsed(repeat_keys[i].timer) > repeat_keys[i].current_interval_ms) {
+                    register_code(repeat_keys[i].keycode);
+                    unregister_code(repeat_keys[i].keycode);
+                    repeat_keys[i].timer = timer_read();
+                    // Set next interval with jitter
+                    repeat_keys[i].current_interval_ms = repeat_keys[i].interval_ms;
+                    if (repeat_keys[i].jitter_ms > 0) {
+                        repeat_keys[i].current_interval_ms += rand() % (repeat_keys[i].jitter_ms + 1);
+                    }
+                }
+            }
+        }
+    }
+}
 
