@@ -11,7 +11,7 @@ enum layers {
     _COLEMAKDH = 0,
     // _GRAPHITE = 0,
     _GAME=1,
-// Miryoku
+    // Miryoku
     _MEDIA=2,
     _NAV=3,
     _MOUSE=4,
@@ -54,8 +54,6 @@ enum custom_keycodes {
     // HR_A = MT(MOD_RSFT, KC_A),
     // HR_E = MT(MOD_RALT, KC_E),
     // HR_I = MT(MOD_RGUI, KC_I),
-
-    REPEAT_TOGGLE
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -196,7 +194,7 @@ bool process_detected_host_os_user(os_variant_t detected_os) {
 
 // World of Warcraft
 
-#define LAYER_GAMING 1
+#define LAYER_GAMING _GAME
 
 typedef struct {
     uint16_t keycode;
@@ -211,33 +209,57 @@ typedef struct {
 
 // D is toggle-to-repeat, interval 2500ms; F is hold-to-repeat (example)
 repeat_key_t repeat_keys[] = {
-    {KC_D, 2500, 50, 2500, false, false, 0, false},   // D toggles repeat, 2.5s interval
+    {KC_D, 2500, 100, 2500, false, false, 0, false},   // D toggles repeat, 2.5s interval
+    {KC_SPC, 60000, 100, 60000, false, false, 0, false},   // D toggles repeat, 2.5s interval
     {KC_X, 5000, 100, 5000, false, false, 0, true}      // X hold-to-repeat, 200ms interval
-    // {KC_F, 200, 100, 200, false, false, 0, true}      // F hold-to-repeat, 200ms interval
+    // {KC_F, 3500, 100, 3500, false, false, 0, true}      // F hold-to-repeat, 200ms interval
 };
 #define NUM_REPEAT_KEYS (sizeof(repeat_keys)/sizeof(repeat_keys[0]))
 
-bool repeat_mode_enabled = true;  // Or toggleable elsewhere
+// for auto-run feature
+static bool autorun_enabled = true;
+static uint16_t s_timer = 0;
+static bool s_held = false;
+static bool s_replaced = false;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    if (keycode == REPEAT_TOGGLE && record->event.pressed) {
-        repeat_mode_enabled = !repeat_mode_enabled;
-        return false;
-    }
+    if (layer_state_is(LAYER_GAMING)) {
 
-    if (repeat_mode_enabled && layer_state_is(LAYER_GAMING)) {
-        // 1. Check for hold-repeat cancellation by other key presses
+        if (autorun_enabled) {
+            switch (keycode) {
+                case KC_S:
+                    if (record->event.pressed) {
+                        s_held = true;
+                        s_timer = timer_read();
+                        s_replaced = false;
+                    } else {
+                        s_held = false;
+                        s_replaced = false;
+                    }
+                    break;
+            }
+
+            // If S is being replaced, suppress KC_S
+            if (keycode == KC_S && s_replaced) {
+                return false;
+            }
+        }
+
+        // Check for hold-repeat cancellation by other key presses
         if (record->event.pressed) {
-            for (int i = 0; i < NUM_REPEAT_KEYS; i++) {
-                if (repeat_keys[i].repeat_active
-                    && keycode != repeat_keys[i].keycode) {
-                    repeat_keys[i].repeat_active = false;
-                    repeat_keys[i].first_press_sent = false;
+            if (keycode != KC_TAB) {
+                // don't cancel on tab for target selection
+                for (int i = 0; i < NUM_REPEAT_KEYS; i++) {
+                    if (repeat_keys[i].repeat_active
+                        && keycode != repeat_keys[i].keycode) {
+                        repeat_keys[i].repeat_active = false;
+                        repeat_keys[i].first_press_sent = false;
+                    }
                 }
             }
         }
 
-        // 2. Handle repeat logic as before
+        // Handle repeat logic
         for (int i = 0; i < NUM_REPEAT_KEYS; i++) {
             if (keycode == repeat_keys[i].keycode) {
                 if (repeat_keys[i].hold) {
@@ -264,9 +286,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                             repeat_keys[i].repeat_active = false;
                             repeat_keys[i].first_press_sent = false;
                         } else {
-                            // Turn on and send initial press
-                            register_code(repeat_keys[i].keycode);
-                            unregister_code(repeat_keys[i].keycode);
                             repeat_keys[i].repeat_active = true;
                             repeat_keys[i].first_press_sent = true;
                             repeat_keys[i].timer = timer_read();
@@ -275,6 +294,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                                 repeat_keys[i].current_interval_ms += rand() % (repeat_keys[i].jitter_ms + 1);
                             }
                         }
+                        // Turn on and send initial press
+                        register_code(repeat_keys[i].keycode);
+                        // Generate random delay between 60 and 70 ms
+                        uint8_t delay = 30 + (rand() % 31); // rand() % 11 gives 0-10
+                        wait_ms(delay);
+                        unregister_code(repeat_keys[i].keycode);
                     }
                 }
                 return false;
@@ -285,11 +310,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 void matrix_scan_user(void) {
-    if (repeat_mode_enabled && layer_state_is(LAYER_GAMING)) {
+    if (layer_state_is(LAYER_GAMING)) {
+
+        if (autorun_enabled) {
+            if (s_held && !s_replaced) {
+                if (timer_elapsed(s_timer) > 2000) { // 2 seconds
+                    // Stop sending S, send middle mouse button click instead
+                    register_code(MS_BTN3);   // Press middle mouse button
+                    unregister_code(MS_BTN3); // Release middle mouse button
+                    s_replaced = true;
+                }
+            }
+        }
+
         for (int i = 0; i < NUM_REPEAT_KEYS; i++) {
             if (repeat_keys[i].repeat_active && repeat_keys[i].first_press_sent) {
                 if (timer_elapsed(repeat_keys[i].timer) > repeat_keys[i].current_interval_ms) {
                     register_code(repeat_keys[i].keycode);
+                    // Generate random delay between 60 and 70 ms
+                    uint8_t delay = 30 + (rand() % 31); // rand() % 11 gives 0-10
+                    wait_ms(delay);
                     unregister_code(repeat_keys[i].keycode);
                     repeat_keys[i].timer = timer_read();
                     // Set next interval with jitter
