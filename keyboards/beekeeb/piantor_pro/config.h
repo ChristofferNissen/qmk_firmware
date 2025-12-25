@@ -18,11 +18,6 @@
 
 #define TAPPING_TERM 175
 
-// 1000hz polling rate for better mouse key response
-#define USB_POLLING_INTERVAL_MS 1
-
-#define DEBOUNCE 2
-
 // Other settings //
 #define HOLD_ON_OTHER_KEY_PRESS_PER_KEY
 
@@ -54,3 +49,12 @@
 #define FLOW_TAP_TERM 150
 
 #define USB_MAX_POWER_CONSUMPTION 100
+
+// QMK OPMITIMIZATIONS
+#define DEBOUNCE 2
+#define DEBOUNCE_TYPE symm
+// 1000hz polling rate for better mouse key response
+#define USB_POLLING_INTERVAL_MS 1
+// #define QMK_KEYS_PER_SCAN 12
+#define F_CPU 16000000
+

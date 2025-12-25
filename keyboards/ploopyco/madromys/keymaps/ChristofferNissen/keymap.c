@@ -32,7 +32,7 @@ int16_t bright_acum_x = 0;
 int16_t bright_acum_y = 0;
 
 // --- CONFIGURATION ---
-#define MEDIA_THRESHOLD 250   // Sensitivity threshold for media controls
+#define MEDIA_THRESHOLD 150   // Sensitivity threshold for media controls
 
 // --- MEDIA TAP DANCE ---
 void media_click_finished(tap_dance_state_t *state, void *user_data) {
@@ -92,11 +92,11 @@ tap_dance_action_t tap_dance_actions[] = {
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [_BASE] = LAYOUT(TD(TD_BRIGHT_CTRL), TD(TD_MEDIA_CTRL), DRAG_SCROLL, ZOOM_BTN3, MS_BTN1, MS_BTN2),
+    [_BASE] = LAYOUT(TD(TD_BRIGHT_CTRL), TD(TD_MEDIA_CTRL), DRAG_SCROLL, MS_BTN2, MS_BTN1, ZOOM_BTN3),
 
     // Media Layer - Transparent (handled via C code logic)
     [_MEDIA] = LAYOUT(_______, _______, _______, _______, _______, _______),
-    [_BRIGHTNESS] = LAYOUT(_______, _______, _______, _______, _______, _______),
+    [_BRIGHTNESS] = LAYOUT(_______, _______, _______, _______, _______, QK_BOOT),
 
     // Playback Layer - Media Controls
     [_PLAYBACK] = LAYOUT(KC_MPRV,  TO(_BASE), KC_MPLY,  KC_MNXT, KC_MFFD,  KC_MRWD ),
@@ -154,10 +154,10 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 
         // Volume (Y-axis)
         if (media_acum_y > MEDIA_THRESHOLD) {
-            tap_code(KC_VOLD);
+            tap_code(KC_VOLU);
             media_acum_y = 0;
         } else if (media_acum_y < -MEDIA_THRESHOLD) {
-            tap_code(KC_VOLU);
+            tap_code(KC_VOLD);
             media_acum_y = 0;
         }
 
